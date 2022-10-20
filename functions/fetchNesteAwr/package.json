@@ -1,0 +1,22 @@
+{
+  "name": "fetchnesteawr",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@types/yauzl-promise": "^2.1.0",
+    "aws-sdk": "^2.669.0",
+    "axios": "^0.19.2",
+    "dotenv": "^8.2.0",
+    "googleapis": "^49.0.0",
+    "json2csv": "^5.0.1",
+    "moment": "^2.25.1",
+    "yauzl-promise": "^2.1.3"
+  }
+}
