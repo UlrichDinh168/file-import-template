@@ -1,7 +1,7 @@
 import axios from 'axios'
 import yauzl from 'yauzl-promise'
 import moment from 'moment'
-import { sendMessage, downloadFile, pause, sendToDrive, keyStore } from './functions/fetchNesteAwr/utils/index.js'
+import { sendMessage, downloadFile, pause, sendToDrive, keyStore } from './functions/utils/index.js'
 
 // module.exports.fetch = async event => {
 export const fetch = async () => {
@@ -45,4 +45,4 @@ export const fetch = async () => {
 
 };
 
-// fetch()
+fetch()

@@ -42,7 +42,6 @@ export const keyStore = async (type) => {
 
     case "drive_dir":
       const drive_dir = parameters.find(param => param.Name === "DRIVE_DIRECTORY").Value
-      console.log([drive_dir], 'drive_dir');
       return [drive_dir]
 
     default:

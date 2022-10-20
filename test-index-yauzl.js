@@ -1,9 +1,8 @@
 
 import axios from 'axios'
-import fs from 'fs'
 import yauzl from 'yauzl'
 import moment from 'moment'
-import { sendMessage, downloadFile, pause, sendToDrive, keyStore } from './functions/fetchNesteAwr/utils/index.js'
+import { sendMessage, downloadFile, pause, sendToDrive, keyStore } from './functions/utils/index.js'
 
 export const fetch = async () => {
   console.log("run");
@@ -13,7 +12,6 @@ export const fetch = async () => {
   const baseUrl = "https://api.awrcloud.com/v2/get.php";
 
   const awrUrl = `${baseUrl}?action=export_ranking&project=${project}&token=${await keyStore('awrToken')}&startDate=${start}&stopDate=${start}`
-
 
   const projectPath = `${project}.zip`;
   try {
