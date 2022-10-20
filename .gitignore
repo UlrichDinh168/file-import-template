@@ -1,5 +1,5 @@
 /node_modules
-/functions/fetchNesteAwr/node_modules
+/functions/node_modules
 
 # Mac/OSX
 .DS_Store

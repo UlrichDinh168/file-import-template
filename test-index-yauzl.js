@@ -58,4 +58,4 @@ export const fetch = async () => {
   }
 };
 
-// fetch()
+fetch()

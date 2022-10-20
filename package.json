@@ -6,6 +6,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node test-index.js",
+    "startyauzl": "node test-index-yauzl.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",

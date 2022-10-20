@@ -11,5 +11,5 @@ A simple app that exports data from Advanced Web Ranking (AWR) and saves to Goog
 
 ## Notes
 - Files locate inside `functions` folder are for Lambda execution.
-- `test-index.js` uses [yauzl](https://github.com/thejoshwolfe/yauzl.git)
-- `test-index-yauzl.js` uses [yauzl-proimse](https://github.com/overlookmotel/yauzl-promise)
+- Run `npm start` to start `test-index.js` that uses [yauzl](https://github.com/thejoshwolfe/yauzl.git)
+- Run `npm run startyauzl` to start `test-index-yauzl.js` that uses [yauzl-proimse](https://github.com/overlookmotel/yauzl-promise)
