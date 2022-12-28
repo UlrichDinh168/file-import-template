@@ -1,0 +1,562 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "The AWS CloudFormation template for this Serverless application",
+  "Resources": {
+    "ServerlessDeploymentBucket": {
+      "Type": "AWS::S3::Bucket",
+      "Properties": {
+        "BucketEncryption": {
+          "ServerSideEncryptionConfiguration": [
+            {
+              "ServerSideEncryptionByDefault": {
+                "SSEAlgorithm": "AES256"
+              }
+            }
+          ]
+        }
+      }
+    },
+    "ServerlessDeploymentBucketPolicy": {
+      "Type": "AWS::S3::BucketPolicy",
+      "Properties": {
+        "Bucket": {
+          "Ref": "ServerlessDeploymentBucket"
+        },
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": "s3:*",
+              "Effect": "Deny",
+              "Principal": "*",
+              "Resource": [
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:aws:s3:::",
+                      {
+                        "Ref": "ServerlessDeploymentBucket"
+                      },
+                      "/*"
+                    ]
+                  ]
+                }
+              ],
+              "Condition": {
+                "Bool": {
+                  "aws:SecureTransport": false
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "FetchNesteAwrSELogGroup": {
+      "Type": "AWS::Logs::LogGroup",
+      "Properties": {
+        "LogGroupName": "/aws/lambda/neste-awr-dev-fetchNesteAwrSE"
+      }
+    },
+    "FetchNesteAwrNLLogGroup": {
+      "Type": "AWS::Logs::LogGroup",  
+      "Properties": {
+        "LogGroupName": "/aws/lambda/neste-awr-dev-fetchNesteAwrNL"
+      }
+    },
+    "FetchNesteAwrUSLogGroup": {
+      "Type": "AWS::Logs::LogGroup",
+      "Properties": {
+        "LogGroupName": "/aws/lambda/neste-awr-dev-fetchNesteAwrUS"
+      }
+    },
+    "FetchNesteAwrDELogGroup": {
+      "Type": "AWS::Logs::LogGroup",
+      "Properties": {
+        "LogGroupName": "/aws/lambda/neste-awr-dev-fetchNesteAwrDE"
+      }
+    },
+    "FetchNesteAwrBELogGroup": {
+      "Type": "AWS::Logs::LogGroup",
+      "Properties": {
+        "LogGroupName": "/aws/lambda/neste-awr-dev-fetchNesteAwrBE"
+      }
+    },
+    "IamRoleLambdaExecution": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              },
+              "Action": [
+                "sts:AssumeRole"
+              ]
+            }
+          ]
+        },
+        "Policies": [
+          {
+            "PolicyName": {
+              "Fn::Join": [
+                "-",
+                [
+                  "dev",
+                  "neste-awr",
+                  "lambda"
+                ]
+              ]
+            },
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                      "iam:GetRole"
+                  ],
+                  "Resource": "*"
+              },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                      "iam:PutRolePolicy "
+                  ],
+                  "Resource": "*"
+              },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "logs:CreateLogStream"
+                  ],
+                  "Resource": [
+                    {
+                      "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/neste-awr-dev*:*"
+                    }
+                  ]
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "logs:PutLogEvents"
+                  ],
+                  "Resource": [
+                    {
+                      "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/neste-awr-dev*:*:*"
+                    }
+                  ]
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "ssm:GetParameters"
+                  ],
+                  "Resource": [
+                    "arn:aws:ssm:eu-west-1:769555838805:parameter/MC_AWR_TOKEN",
+                    "arn:aws:ssm:eu-west-1:769555838805:parameter/NESTE_GDRIVE_KEY"
+                  ]
+                }
+                
+              ]
+            }
+          }
+        ],
+        "Path": "/",
+        "RoleName": {
+          "Fn::Join": [
+            "-",
+            [
+              "neste-awr",
+              "dev",
+              {
+                "Ref": "AWS::Region"
+              },
+              "lambdaRole"
+            ]
+          ]
+        }
+      }
+    },
+    "FetchNesteAwrSELambdaFunction": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Ref": "ServerlessDeploymentBucket"
+          },
+          "S3Key": "serverless/neste-awr/dev/1589873321190-2020-05-19T07:28:41.190Z/neste-awr.zip"
+        },
+        "FunctionName": "neste-awr-dev-fetchNesteAwrSE",
+        "Handler": "functions/fetchNesteAwr/handler.fetch",
+        "MemorySize": 1024,
+        "Role": {
+          "Fn::GetAtt": [
+            "IamRoleLambdaExecution",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs16.x",
+        "Timeout": 60
+      },
+      "DependsOn": [
+        "FetchNesteAwrSELogGroup",
+        "IamRoleLambdaExecution"
+      ]
+    },
+    "FetchNesteAwrSELambdaVersionWIiutdLztL6j3ZaNcAIONljG7Qk6rflUAORj6affgU": {
+      "Type": "AWS::Lambda::Version",
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "FunctionName": {
+          "Ref": "FetchNesteAwrSELambdaFunction"
+        },
+        "CodeSha256": "jLGiti6kiGYqAF0PNYZrTGflt70BvnjvMehhzsu6fEo="
+      }
+    },
+    "FetchNesteAwrNLLambdaFunction": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Ref": "ServerlessDeploymentBucket"
+          },
+          "S3Key": "serverless/neste-awr/dev/1589873321190-2020-05-19T07:28:41.190Z/neste-awr.zip"
+        },
+        "FunctionName": "neste-awr-dev-fetchNesteAwrNL",
+        "Handler": "functions/fetchNesteAwr/handler.fetch",
+        "MemorySize": 1024,
+        "Role": {
+          "Fn::GetAtt": [
+            "IamRoleLambdaExecution",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs16.x",
+        "Timeout": 60
+      },
+      "DependsOn": [
+        "FetchNesteAwrNLLogGroup",
+        "IamRoleLambdaExecution"
+      ]
+    },
+    "FetchNesteAwrNLLambdaVersionjcI9DiqIUgWqyWa7Mt67X5Wcaf5WiBDOaPP5JxYMOOw": {
+      "Type": "AWS::Lambda::Version",
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "FunctionName": {
+          "Ref": "FetchNesteAwrNLLambdaFunction"
+        },
+        "CodeSha256": "jLGiti6kiGYqAF0PNYZrTGflt70BvnjvMehhzsu6fEo="
+      }
+    },
+    "FetchNesteAwrUSLambdaFunction": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Ref": "ServerlessDeploymentBucket"
+          },
+          "S3Key": "serverless/neste-awr/dev/1589873321190-2020-05-19T07:28:41.190Z/neste-awr.zip"
+        },
+        "FunctionName": "neste-awr-dev-fetchNesteAwrUS",
+        "Handler": "functions/fetchNesteAwr/handler.fetch",
+        "MemorySize": 1024,
+        "Role": {
+          "Fn::GetAtt": [
+            "IamRoleLambdaExecution",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs16.x",
+        "Timeout": 60
+      },
+      "DependsOn": [
+        "FetchNesteAwrUSLogGroup",
+        "IamRoleLambdaExecution"
+      ]
+    },
+    "FetchNesteAwrUSLambdaVersionxmtXTIM1l3uvVA8dPaJeGSLPPCCasOBJRyhW8moCmE": {
+      "Type": "AWS::Lambda::Version",
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "FunctionName": {
+          "Ref": "FetchNesteAwrUSLambdaFunction"
+        },
+        "CodeSha256": "jLGiti6kiGYqAF0PNYZrTGflt70BvnjvMehhzsu6fEo="
+      }
+    },
+    "FetchNesteAwrDELambdaFunction": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Ref": "ServerlessDeploymentBucket"
+          },
+          "S3Key": "serverless/neste-awr/dev/1589873321190-2020-05-19T07:28:41.190Z/neste-awr.zip"
+        },
+        "FunctionName": "neste-awr-dev-fetchNesteAwrDE",
+        "Handler": "functions/fetchNesteAwr/handler.fetch",
+        "MemorySize": 1024,
+        "Role": {
+          "Fn::GetAtt": [
+            "IamRoleLambdaExecution",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs16.x",
+        "Timeout": 60
+      },
+      "DependsOn": [
+        "FetchNesteAwrDELogGroup",
+        "IamRoleLambdaExecution"
+      ]
+    },
+    "FetchNesteAwrBELambdaFunction": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Ref": "ServerlessDeploymentBucket"
+          },
+          "S3Key": "serverless/neste-awr/dev/1589873321190-2020-05-19T07:28:41.190Z/neste-awr.zip"
+        },
+        "FunctionName": "neste-awr-dev-fetchNesteAwrBE",
+        "Handler": "functions/fetchNesteAwr/handler.fetch",
+        "MemorySize": 1024,
+        "Role": {
+          "Fn::GetAtt": [
+            "IamRoleLambdaExecution",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs16.x",
+        "Timeout": 60
+      },
+      "DependsOn": [
+        "FetchNesteAwrBELogGroup",
+        "IamRoleLambdaExecution"
+      ]
+    },
+    "FetchNesteAwrSEEventsRuleSchedule1": {
+      "Type": "AWS::Events::Rule",
+      "Properties": {
+        "ScheduleExpression": "rate(1 day)",
+        "State": "ENABLED",
+        "Targets": [
+          {
+            "Input": "{\"project\":\"Neste.se\"}",
+            "Arn": {
+              "Fn::GetAtt": [
+                "FetchNesteAwrSELambdaFunction",
+                "Arn"
+              ]
+            },
+            "Id": "fetchNesteAwrSESchedule"
+          }
+        ]
+      }
+    },
+    "FetchNesteAwrSELambdaPermissionEventsRuleSchedule1": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "FetchNesteAwrSELambdaFunction",
+            "Arn"
+          ]
+        },
+        "Action": "lambda:InvokeFunction",
+        "Principal": "events.amazonaws.com",
+        "SourceArn": {
+          "Fn::GetAtt": [
+            "FetchNesteAwrSEEventsRuleSchedule1",
+            "Arn"
+          ]
+        }
+      }
+    },
+    "FetchNesteAwrNLEventsRuleSchedule1": {
+      "Type": "AWS::Events::Rule",
+      "Properties": {
+        "ScheduleExpression": "rate(1 day)",
+        "State": "ENABLED",
+        "Targets": [
+          {
+            "Input": "{\"project\":\"Neste.nl\"}",
+            "Arn": {
+              "Fn::GetAtt": [
+                "FetchNesteAwrNLLambdaFunction",
+                "Arn"
+              ]
+            },
+            "Id": "fetchNesteAwrNLSchedule"
+          }
+        ]
+      }
+    },
+    "FetchNesteAwrNLLambdaPermissionEventsRuleSchedule1": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "FetchNesteAwrNLLambdaFunction",
+            "Arn"
+          ]
+        },
+        "Action": "lambda:InvokeFunction",
+        "Principal": "events.amazonaws.com",
+        "SourceArn": {
+          "Fn::GetAtt": [
+            "FetchNesteAwrNLEventsRuleSchedule1",
+            "Arn"
+          ]
+        }
+      }
+    },
+    "FetchNesteAwrUSEventsRuleSchedule1": {
+      "Type": "AWS::Events::Rule",
+      "Properties": {
+        "ScheduleExpression": "rate(1 day)",
+        "State": "ENABLED",
+        "Targets": [
+          {
+            "Input": "{\"project\":\"Neste.us\"}",
+            "Arn": {
+              "Fn::GetAtt": [
+                "FetchNesteAwrUSLambdaFunction",
+                "Arn"
+              ]
+            },
+            "Id": "fetchNesteAwrUSSchedule"
+          }
+        ]
+      }
+    },
+    "FetchNesteAwrUSLambdaPermissionEventsRuleSchedule1": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "FetchNesteAwrUSLambdaFunction",
+            "Arn"
+          ]
+        },
+        "Action": "lambda:InvokeFunction",
+        "Principal": "events.amazonaws.com",
+        "SourceArn": {
+          "Fn::GetAtt": [
+            "FetchNesteAwrUSEventsRuleSchedule1",
+            "Arn"
+          ]
+        }
+      }
+    },
+    "FetchNesteAwrBEEventsRuleSchedule1": {
+      "Type": "AWS::Events::Rule",
+      "Properties": {
+        "ScheduleExpression": "rate(1 day)",
+        "State": "ENABLED",
+        "Targets": [
+          {
+            "Input": "{\"project\":\"Neste.be\"}",
+            "Arn": {
+              "Fn::GetAtt": [
+                "FetchNesteAwrBELambdaFunction",
+                "Arn"
+              ]
+            },
+            "Id": "fetchNesteAwrBESchedule"
+          }
+        ]
+      }
+    },
+    "FetchNesteAwrBELambdaPermissionEventsRuleSchedule1": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "FetchNesteAwrBELambdaFunction",
+            "Arn"
+          ]
+        },
+        "Action": "lambda:InvokeFunction",
+        "Principal": "events.amazonaws.com",
+        "SourceArn": {
+          "Fn::GetAtt": [
+            "FetchNesteAwrBEEventsRuleSchedule1",
+            "Arn"
+          ]
+        }
+      }
+    },
+    "FetchNesteAwrDEEventsRuleSchedule1": {
+      "Type": "AWS::Events::Rule",
+      "Properties": {
+        "ScheduleExpression": "rate(1 day)",
+        "State": "ENABLED",
+        "Targets": [
+          {
+            "Input": "{\"project\":\"Neste.de\"}",
+            "Arn": {
+              "Fn::GetAtt": [
+                "FetchNesteAwrDELambdaFunction",
+                "Arn"
+              ]
+            },
+            "Id": "fetchNesteAwrDESchedule"
+          }
+        ]
+      }
+    },
+    "FetchNesteAwrDELambdaPermissionEventsRuleSchedule1": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "FetchNesteAwrDELambdaFunction",
+            "Arn"
+          ]
+        },
+        "Action": "lambda:InvokeFunction",
+        "Principal": "events.amazonaws.com",
+        "SourceArn": {
+          "Fn::GetAtt": [
+            "FetchNesteAwrDEEventsRuleSchedule1",
+            "Arn"
+          ]
+        }
+      }
+    }
+  },
+  "Outputs": {
+    "ServerlessDeploymentBucketName": {
+      "Value": {
+        "Ref": "ServerlessDeploymentBucket"
+      }
+    },
+    "FetchNesteAwrSELambdaFunctionQualifiedArn": {
+      "Description": "Current Lambda function version",
+      "Value": {
+        "Ref": "FetchNesteAwrSELambdaVersionWIiutdLztL6j3ZaNcAIONljG7Qk6rflUAORj6affgU"
+      }
+    },
+    "FetchNesteAwrNLLambdaFunctionQualifiedArn": {
+      "Description": "Current Lambda function version",
+      "Value": {
+        "Ref": "FetchNesteAwrNLLambdaVersionjcI9DiqIUgWqyWa7Mt67X5Wcaf5WiBDOaPP5JxYMOOw"
+      }
+    },
+    "FetchNesteAwrUSLambdaFunctionQualifiedArn": {
+      "Description": "Current Lambda function version",
+      "Value": {
+        "Ref": "FetchNesteAwrUSLambdaVersionxmtXTIM1l3uvVA8dPaJeGSLPPCCasOBJRyhW8moCmE"
+      }
+    }
+  }
+}
